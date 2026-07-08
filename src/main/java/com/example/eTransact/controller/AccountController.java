@@ -40,8 +40,13 @@ public class AccountController {
     @PatchMapping(path = "/{id}/intrabanktransfer")
     public ResponseEntity<?> onNetTransfer(TransferRequest request){
 
-        transferService.transfer(request);
+        try{
+            transferService.transfer(request);
+        } catch (RuntimeException e) {
+            throw e;
+        }
         return ResponseEntity.noContent().build();
     }
+
 
 }

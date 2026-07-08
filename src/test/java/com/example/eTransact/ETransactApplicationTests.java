@@ -53,7 +53,10 @@ class ETransactApplicationTests extends BaseClass{
 
 		client.post().uri("/user/create").body(form2).retrieve().toBodilessEntity();
 
-		List<User> users = client.get().uri("/user").retrieve().body(new ParameterizedTypeReference<List<User>>() {
+		List<User> users = client.get().uri("/user")
+				.headers(httpHeaders -> httpHeaders.setBasicAuth("ronald@gmail.com", "C5136ca1$"))
+				.retrieve()
+				.body(new ParameterizedTypeReference<List<User>>() {
 			@Override
 			public Type getType() {
 				return super.getType();
@@ -71,15 +74,21 @@ class ETransactApplicationTests extends BaseClass{
 
 	@Test
 	void shouldLinkNewAccountToAnExistingUser(){
-		List<User> users = client.get().uri("/user").retrieve().body(new ParameterizedTypeReference<List<User>>() {
+		List<User> users = client.get().uri("/user")
+				.headers(httpHeaders -> httpHeaders.setBasicAuth("ronald@gmail.com", "C5136ca1$"))
+				.retrieve().body(new ParameterizedTypeReference<List<User>>() {
 			@Override
 			public Type getType() {
 				return super.getType();
 			}
 		});
+		client.post().uri("/user/addaccount")
+				.headers(httpHeaders -> httpHeaders.setBasicAuth("ronald@gmail.com", "C5136ca1$"))
+				.body(users.getFirst().getId()).retrieve().toBodilessEntity();
 
-		client.post().uri("/user/addaccount").body(users.getFirst().getId()).retrieve().toBodilessEntity();
-		User use = client.get().uri("/user/{id}", users.getFirst().getId()).retrieve().body(User.class);
+		User use = client.get().uri("/user/{id}", users.getFirst().getId())
+				.headers(httpHeaders -> httpHeaders.setBasicAuth("ronald@gmail.com", "C5136ca1$"))
+				.retrieve().body(User.class);
 		assertAll(
 				()-> assertEquals(2, use.getAccounts().size()),
 				()-> assertEquals(1, users.getLast().getAccounts().size())

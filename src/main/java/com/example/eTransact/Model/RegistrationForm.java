@@ -2,6 +2,7 @@ package com.example.eTransact.Model;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
@@ -78,14 +79,14 @@ public class RegistrationForm {
     public String getPhoneNumber() {
         return phoneNumber;
     }
-    public User toUser(){
+    public User toUser(PasswordEncoder encoder){
         User user = new User();
         user.setAddress(address);
         user.setDob(dob);
         user.setEmail(email);
         user.setLastName(lastname);
         user.setFirstname(firstname);
-        user.setPassword(password);
+        user.setPassword(encoder.encode(password));
         user.setPhoneNo(phoneNumber);
         return  user;
     }

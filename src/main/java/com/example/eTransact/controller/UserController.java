@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -30,11 +31,13 @@ public class UserController {
 
     private final UserRepository userRepository;
     private  final AccountRepository accountRepository;
+    private final  PasswordEncoder encoder;
 
 
-    public UserController(UserRepository userRepository, AccountRepository accountRepository){
+    public UserController(UserRepository userRepository, AccountRepository accountRepository, PasswordEncoder encoder){
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
+        this.encoder = encoder;
     }
 
     @PostMapping(path = "/create")
@@ -67,7 +70,7 @@ public class UserController {
                             formError(errors, emailNotMatched, passwordMisMatched, isUnderAge)),
                     HttpStatusCode.valueOf(422));
         }
-        User user = linkAccountToUser(form.toUser(), User.class);
+        User user = linkAccountToUser(form.toUser(encoder), User.class);
 
         URI  location = toURi("/user/{id}", user.getId());
         return ResponseEntity.created(location).build();
